@@ -1,0 +1,36 @@
+name: Generate Gradle Wrapper
+
+on:
+workflow_dispatch:
+
+permissions:
+contents: write
+
+jobs:
+generate:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout repository
+uses: actions/checkout@v4
+
+  - name: Set up Java
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '17'
+
+  - name: Install Gradle
+    uses: gradle/actions/setup-gradle@v4
+    with:
+      gradle-version: '9.3.1'
+
+  - name: Generate wrapper files
+    run: gradle wrapper --gradle-version 9.3.1 --distribution-type bin
+
+  - name: Commit wrapper files
+    run: |
+      git config user.name "github-actions[bot]"
+      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties
+      git commit -m "Add Gradle wrapper files" || echo "No changes to commit"
+      git push
