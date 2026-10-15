@@ -1,10 +1,10 @@
 name: Generate Gradle Wrapper
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
-contents: write
+  contents: write
 
 jobs:
   generate:
