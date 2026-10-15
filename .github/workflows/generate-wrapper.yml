@@ -9,58 +9,41 @@ contents: write
 jobs:
 generate-wrapper:
 runs-on: ubuntu-latest
-
 steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+- name: Checkout repository
+uses: actions/checkout@v4
 
-  - name: Set up Java 17
+  - name: Set up Java
     uses: actions/setup-java@v4
     with:
       distribution: temurin
       java-version: '17'
 
-  - name: Install Gradle 9.3.1
+  - name: Install Gradle
     uses: gradle/actions/setup-gradle@v4
     with:
       gradle-version: '9.3.1'
 
-  - name: Generate wrapper files
+  - name: Generate Gradle Wrapper
     shell: bash
     run: |
       mkdir -p /tmp/wrapper-project
       cd /tmp/wrapper-project
-
       printf "plugins { id 'base' }\n" > build.gradle
-
-      gradle wrapper \
-        --gradle-version 9.3.1 \
-        --distribution-type bin
+      gradle wrapper --gradle-version 9.3.1 --distribution-type bin
 
       cp gradlew "$GITHUB_WORKSPACE/gradlew"
       cp gradlew.bat "$GITHUB_WORKSPACE/gradlew.bat"
       mkdir -p "$GITHUB_WORKSPACE/gradle/wrapper"
-      cp gradle/wrapper/gradle-wrapper.jar \
-        "$GITHUB_WORKSPACE/gradle/wrapper/gradle-wrapper.jar"
-      cp gradle/wrapper/gradle-wrapper.properties \
-        "$GITHUB_WORKSPACE/gradle/wrapper/gradle-wrapper.properties"
-
-  - name: Make wrapper executable
-    run: chmod +x gradlew
+      cp gradle/wrapper/gradle-wrapper.jar "$GITHUB_WORKSPACE/gradle/wrapper/"
+      cp gradle/wrapper/gradle-wrapper.properties "$GITHUB_WORKSPACE/gradle/wrapper/"
 
   - name: Commit wrapper files
     shell: bash
     run: |
+      chmod +x gradlew
       git config user.name "github-actions[bot]"
       git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      git add gradlew gradlew.bat \
-        gradle/wrapper/gradle-wrapper.jar \
-        gradle/wrapper/gradle-wrapper.properties
-
-      if git diff --cached --quiet; then
-        echo "No wrapper changes to commit."
-      else
-        git commit -m "Add Gradle Wrapper"
-        git push origin "HEAD:${GITHUB_REF_NAME}"
-      fi
+      git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties
+      git diff --cached --quiet || git commit -m "Add Gradle Wrapper"
+      git push origin "HEAD:${GITHUB_REF_NAME}"
