@@ -19,7 +19,7 @@ uses: actions/checkout@v4
       distribution: temurin
       java-version: '17'
 
-  - name: Install Gradle
+  - name: Set up Gradle
     uses: gradle/actions/setup-gradle@v4
     with:
       gradle-version: '9.3.1'
